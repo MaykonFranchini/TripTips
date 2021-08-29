@@ -33,16 +33,8 @@ export default function Home(props) {
   const [weather, setWeather] = useState<Weather>(props);
   const [locations, setLocations] = useState<Location[]>([]);
 
-  // const getWeather = async (city: string) => {
-    
-  // }
-
-  
-
-  async function handleWeather(event) {
-    event.preventDefault()
-
-      const urlToFetch = `${weatherUrl}?&q=${city}&APPID=67cbbcf670ade9bdc624ac5d94c5534d`;
+  const getWeather = async () => {
+    const urlToFetch = `${weatherUrl}?&q=${city}&APPID=${process.env.NEXT_PUBLIC_OPENWHEATHER_KEY}`;
   
       const response = await fetch(urlToFetch);
       const jsonResponse = await response.json();
@@ -55,12 +47,25 @@ export default function Home(props) {
         city: jsonResponse.name,
       }
     setWeather(data)
-    console.log(weather)
   }
 
-  // const getLocations = async () => {
+  async function getLocations() {
+    const urlToFetch = `${url}${city}&limit=10&client_id=${process.env.NEXT_PUBLIC_FOURSQUARE_CLIENT_ID}&client_secret=${process.env.NEXT_PUBLIC_FOURSQUARE_CLIENT_SECRET}&v=20210827`;
+    const response = await fetch(urlToFetch);
+    const jsonResponse = await response.json();
+    const venues = jsonResponse.response.groups[0].items.map(item => item.venue);
+    console.log(venues)
+  }
 
-  // }
+
+  async function handleWeather(event) {
+    event.preventDefault()
+    getWeather()
+    getLocations()
+  
+  }
+
+
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const temp = Math.floor(weather.temperature - 273.15)
   return (
@@ -71,7 +76,7 @@ export default function Home(props) {
     <Header/>
     <form onSubmit={handleWeather}>
       <input type="text" id='input' value={city} onChange={e => setCity(e.currentTarget.value)}/>
-      <button type="submit" />
+      <button type="submit" >Search</button>
     </form>
     <div>
       <h2>{weather.city} {days[new Date().getDay()]}</h2>
@@ -79,6 +84,7 @@ export default function Home(props) {
       <p>Condition: {weather.condition}</p>
       <img src={weather.imgUrl} alt="waether icon" />
     </div>
+
     </>
   )
 }
