@@ -18,6 +18,7 @@ interface Location {
   city: string;
   country: string;
   imgUrl: string;
+  name: string;
 }
 
 interface City {
@@ -54,7 +55,18 @@ export default function Home(props) {
     const response = await fetch(urlToFetch);
     const jsonResponse = await response.json();
     const venues = jsonResponse.response.groups[0].items.map(item => item.venue);
-    console.log(venues)
+
+    const venuesFiltered = venues.map( location => {
+      return {
+        name: location.name,
+        address: location.location.formattedAddress[0],
+        city: location.location.formattedAddress[1],
+        country: location.location.formattedAddress[2],
+        imgUrl: `${location.categories[0].icon.prefix}bg_64${location.categories[0].icon.suffix}`,
+      }
+    })
+
+    setLocations(venuesFiltered)
   }
 
 
@@ -84,6 +96,16 @@ export default function Home(props) {
       <p>Condition: {weather.condition}</p>
       <img src={weather.imgUrl} alt="waether icon" />
     </div>
+    <h2>Points of Interest</h2>
+    {locations.map(location => (
+      <div key={location.name}>
+        <img src={location.imgUrl} alt="place icon" />
+        <div>
+        <h3>{location.name}</h3>
+        <p>Address: {location.address}, {location.city}</p>
+        </div>
+      </div>
+    ))}
 
     </>
   )
