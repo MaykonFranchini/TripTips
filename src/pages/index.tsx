@@ -1,9 +1,9 @@
 import { GetServerSideProps } from 'next';
-import { Header } from '../components/Header/index'
+import { Header } from '../components/Header/index';
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
-
-
+import { useState } from 'react';
+import style from '../styles/pages.module.scss';
+import { BsSearch } from 'react-icons/bs';
 
 interface Weather {
   day?:  number;
@@ -30,7 +30,7 @@ export default function Home(props) {
   const url = 'https://api.foursquare.com/v2/venues/explore?near=';
   const weatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
   
-  const [city, setCity] = useState('')
+  const [city, setCity] = useState('');
   const [weather, setWeather] = useState<Weather>(props);
   const [locations, setLocations] = useState<Location[]>([]);
 
@@ -86,27 +86,39 @@ export default function Home(props) {
         <title>Trip Tips</title>
       </Head>
     <Header/>
-    <form onSubmit={handleWeather}>
-      <input type="text" id='input' value={city} onChange={e => setCity(e.currentTarget.value)}/>
-      <button type="submit" >Search</button>
-    </form>
-    <div>
-      <h2>{weather.city} {days[new Date().getDay()]}</h2>
-      <p>Temperature: {temp} °C</p>
-      <p>Condition: {weather.condition}</p>
-      <img src={weather.imgUrl} alt="waether icon" />
-    </div>
-    <h2>Points of Interest</h2>
-    {locations.map(location => (
-      <div key={location.name}>
-        <img src={location.imgUrl} alt="place icon" />
-        <div>
-        <h3>{location.name}</h3>
-        <p>Address: {location.address}, {location.city}</p>
-        </div>
-      </div>
-    ))}
 
+    <div className={style.banner}>
+      <form onSubmit={handleWeather}>
+        <input type="text" id='input' value={city} onChange={e => setCity(e.currentTarget.value)}/>
+        <button type="submit" ><BsSearch /></button>
+      </form>
+    </div>
+
+      <div className={style.infoContainer}>
+        <h2>{weather.city}</h2>
+        <p>Current Weather</p>
+      </div>
+
+      <div className={style.weatherContainer}>
+        <p>{days[new Date().getDay()]}</p>
+        <p>Temperature: {temp} °C</p>
+        <p>Condition: {weather.condition}</p>
+        <img src={weather.imgUrl} alt="waether icon" />
+      </div>
+
+      <h2 className={style.infoContainer}>Points of Interest</h2>
+      <div className={style.locationsContainer}>
+
+      {locations.map(location => (
+        <div className={style.locationContainer } key={location.name}>
+          <img src={location.imgUrl} alt="place icon" />
+          <div>
+          <h3>{location.name}</h3>
+          <p>Address: {location.address}, {location.city}</p>
+          </div>
+        </div>
+      ))}
+      </div>
     </>
   )
 }
